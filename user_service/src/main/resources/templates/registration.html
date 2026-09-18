@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create your account — Gyandarshan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="http://localhost:8081/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="wrap">
+
+    <div class="panel-brand">
+        <div class="brand-mark">
+            <span class="wordmark">Gyandarshan</span>
+        </div>
+
+        <svg class="signature" viewBox="0 0 420 420" aria-hidden="true">
+            <circle cx="210" cy="210" r="40" stroke-width="1"></circle>
+            <circle cx="210" cy="210" r="80" stroke-width="1"></circle>
+            <circle cx="210" cy="210" r="120" stroke-width="1"></circle>
+            <circle cx="210" cy="210" r="160" stroke-width="1"></circle>
+            <circle class="core" cx="210" cy="210" r="6"></circle>
+        </svg>
+
+        <div class="brand-copy">
+            <h1>Every question deserves a place to be asked.</h1>
+            <p>Register to join the conversation — ask questions, share what you know, and learn alongside others.</p>
+        </div>
+
+        <div class="brand-foot">gyandarshan.in</div>
+    </div>
+
+    <div class="panel-form">
+        <div class="form-card">
+            <p class="eyebrow">Get started</p>
+            <h2>Create your account</h2>
+            <p class="sub">Reading is open to everyone. Register to comment and take part.</p>
+
+            <form id="registerForm" novalidate>
+
+                <div class="field" id="nameField">
+                    <label for="name">Full name</label>
+                    <input type="text" id="name" name="name" placeholder="Ravi Kumar" autocomplete="name">
+                    <p class="hint">As you'd like it shown on your comments.</p>
+                    <p class="error-msg" id="nameError">Enter your name.</p>
+                </div>
+
+                <div class="field" id="emailField">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="name@example.com" autocomplete="email">
+                    <p class="hint">We'll send a verification link here.</p>
+                    <p class="error-msg" id="emailError">Enter a valid email address.</p>
+                </div>
+
+                <div class="field" id="passwordField">
+                    <label for="password">Password</label>
+                    <div class="pw-wrap">
+                        <input type="password" id="password" name="password" placeholder="At least 8 characters" autocomplete="new-password">
+                        <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password">Show</button>
+                    </div>
+                    <div class="strength" id="strengthBar" data-level="0" aria-hidden="true">
+                        <i></i><i></i><i></i><i></i>
+                    </div>
+                    <p class="hint">Use 8+ characters with a mix of letters and numbers.</p>
+                    <p class="error-msg" id="passwordError">Password must be at least 8 characters.</p>
+                </div>
+
+                <div class="field" id="confirmField">
+                    <label for="confirmPassword">Confirm password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter your password" autocomplete="new-password">
+                    <p class="error-msg" id="confirmError">Passwords don't match.</p>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <span class="spinner" aria-hidden="true"></span>
+                    <span class="btn-label">Create account</span>
+                </button>
+
+                <div class="form-msg" id="formMsg" role="alert" aria-live="polite"></div>
+            </form>
+
+            <p class="foot-link">Already registered? <a href="#">Sign in</a></p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const form = document.getElementById('registerForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const formMsg = document.getElementById('formMsg');
+    const pwInput = document.getElementById('password');
+    const pwToggle = document.getElementById('pwToggle');
+    const strengthBar = document.getElementById('strengthBar');
+
+    const REGISTER_ENDPOINT = '/api/users/register';
+
+    pwToggle.addEventListener('click', () => {
+      const isHidden = pwInput.type === 'password';
+      pwInput.type = isHidden ? 'text' : 'password';
+      pwToggle.textContent = isHidden ? 'Hide' : 'Show';
+      pwToggle.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+    });
+
+    pwInput.addEventListener('input', () => {
+      const val = pwInput.value;
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+      if (/\d/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      strengthBar.setAttribute('data-level', val.length ? Math.max(score, 1) : 0);
+    });
+
+    function setError(fieldId, show){
+      const field = document.getElementById(fieldId);
+      const input = field.querySelector('input');
+      if (show){
+        field.classList.add('has-error');
+        input.setAttribute('aria-invalid', 'true');
+      } else {
+        field.classList.remove('has-error');
+        input.removeAttribute('aria-invalid');
+      }
+    }
+
+    function validate(){
+      let valid = true;
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!name){ setError('nameField', true); valid = false; } else { setError('nameField', false); }
+
+      if (!email || !emailPattern.test(email)){ setError('emailField', true); valid = false; } else { setError('emailField', false); }
+
+      if (!password || password.length < 8){ setError('passwordField', true); valid = false; } else { setError('passwordField', false); }
+
+      if (confirmPassword !== password || !confirmPassword){ setError('confirmField', true); valid = false; } else { setError('confirmField', false); }
+
+      return valid;
+    }
+
+    ['name','email','password','confirmPassword'].forEach(id => {
+      document.getElementById(id).addEventListener('blur', validate);
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      formMsg.className = 'form-msg';
+      formMsg.textContent = '';
+
+      if (!validate()) return;
+
+      const payload = {
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value
+      };
+
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch(REGISTER_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (res.status === 201){
+          formMsg.textContent = 'Account created. Check your email to verify before commenting.';
+          formMsg.className = 'form-msg success show';
+          form.reset();
+          strengthBar.setAttribute('data-level', 0);
+        } else if (res.status === 409){
+          formMsg.textContent = data.error || 'That email is already registered.';
+          formMsg.className = 'form-msg error show';
+        } else if (res.status === 400){
+          formMsg.textContent = 'Please check the fields above and try again.';
+          formMsg.className = 'form-msg error show';
+          Object.keys(data).forEach(field => {
+            const map = { name: 'nameField', email: 'emailField', password: 'passwordField' };
+            if (map[field]) setError(map[field], true);
+          });
+        } else {
+          formMsg.textContent = 'Something went wrong. Please try again in a moment.';
+          formMsg.className = 'form-msg error show';
+        }
+      } catch (err){
+        formMsg.textContent = 'Could not reach the server. Check your connection and try again.';
+        formMsg.className = 'form-msg error show';
+      } finally {
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+      }
+    });
+</script>
+
+</body>
+</html>
