@@ -13,6 +13,8 @@ A full-stack question-and-answer web application inspired by Quora, built with a
 
 **Frontend:** React, JavaScript, HTML/CSS
 **Backend:** Java, Spring Boot, Spring Security
+**Server:** Eureka-Server
+**API-GATEWAY:** Spring Cloud Starter Gateway Server
 **Auth:** JWT (JSON Web Tokens)
 **Database:** _(add: PostgreSQL )_
 **Build Tools:** Maven / npm
