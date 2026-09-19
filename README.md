@@ -47,7 +47,7 @@ _(Adjust this table to match your actual services.)_
 - Java 17+
 - Node.js 18+
 - Maven
-- (Database of choice)
+- PostgreSQL
 
 ### Backend
 ```bash
